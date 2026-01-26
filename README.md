@@ -40,7 +40,7 @@ A modern, responsive web application for tracking League of Legends champion mas
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/lol-champion-mastery.git
+   git clone https://github.com/MariandreaDelBoccio/lol-champion-mastery.git
    cd lol-champion-mastery
    ```
 
