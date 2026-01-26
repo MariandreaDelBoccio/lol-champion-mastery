@@ -2,8 +2,9 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import Header from './components/Header';
 import ProtectedRoute from './components/ProtectedRoute';
+import IntroPage from './pages/IntroPage';
 import LoginPage from './pages/LoginPage';
-import HomePage from './pages/HomePage';
+import SearchPage from './pages/SearchPage';
 import ProfilePage from './pages/ProfilePage';
 import ChampionPage from './pages/ChampionPage';
 import './App.css';
@@ -21,13 +22,14 @@ function App() {
           <Header />
           <main className="main-content">
             <Routes>
-              {/* Public route - anyone can access login */}
+              {/* Public routes */}
+              <Route path="/" element={<IntroPage />} />
               <Route path="/login" element={<LoginPage />} />
               
               {/* Protected routes - require authentication */}
-              <Route path="/" element={
+              <Route path="/search" element={
                 <ProtectedRoute>
-                  <HomePage />
+                  <SearchPage />
                 </ProtectedRoute>
               } />
               

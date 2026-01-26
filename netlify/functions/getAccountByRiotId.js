@@ -1,23 +1,14 @@
 /**
- * Netlify Function: getSummoner
+ * Netlify Function: getAccountByRiotId
  * 
- * This serverless function acts as a proxy between our React frontend
- * and the Riot Games API. It fetches summoner data by name and region.
+ * This function gets account information (including PUUID) using the new Riot ID format
+ * (Game Name + Tag Line) instead of the old summoner name system.
  * 
- * Why we need this function:
- * 1. CORS: Riot API doesn't allow direct browser requests
- * 2. Security: API keys must be stored securely on the server
- * 3. Rate limiting: Better control over API usage
- * 
- * Architecture:
- * React Frontend → Netlify Function → Riot Games API
+ * Endpoint: /riot/account/v1/accounts/by-riot-id/{gameName}/{tagLine}
  */
 
 /**
  * Helper function to create standardized responses
- * @param {number} statusCode - HTTP status code
- * @param {object} body - Response body
- * @param {object} headers - Additional headers
  */
 function createResponse(statusCode, body, headers = {}) {
   return {
@@ -34,11 +25,29 @@ function createResponse(statusCode, body, headers = {}) {
 }
 
 /**
- * Main handler function for the getSummoner endpoint
- * This function is called when someone makes a request to /.netlify/functions/getSummoner
- * 
- * @param {object} event - Contains request information (body, headers, etc.)
- * @param {object} context - Contains function context information
+ * Get the correct regional endpoint for account API
+ * The account API uses different regional endpoints than game-specific APIs
+ */
+function getAccountRegion(tagLine) {
+  const regionMap = {
+    'EUW': 'europe',
+    'EUNE': 'europe', 
+    'TR1': 'europe',
+    'RU': 'europe',
+    'NA1': 'americas',
+    'BR1': 'americas',
+    'LA1': 'americas',
+    'LA2': 'americas',
+    'KR': 'asia',
+    'JP1': 'asia',
+    'OC1': 'asia'
+  };
+  
+  return regionMap[tagLine] || 'americas';
+}
+
+/**
+ * Main handler function
  */
 exports.handler = async (event, context) => {
   // Handle CORS preflight requests
@@ -46,7 +55,7 @@ exports.handler = async (event, context) => {
     return createResponse(200, { message: 'CORS preflight' });
   }
 
-  // Only allow POST requests for this function
+  // Only allow POST requests
   if (event.httpMethod !== 'POST') {
     return createResponse(405, { 
       error: 'Method not allowed. Use POST.' 
@@ -54,32 +63,29 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    // Parse the request body to get parameters
-    const { summonerName, region = 'na1' } = JSON.parse(event.body || '{}');
+    // Parse request body
+    const { gameName, tagLine } = JSON.parse(event.body || '{}');
 
     // Validate required parameters
-    if (!summonerName || typeof summonerName !== 'string') {
+    if (!gameName || typeof gameName !== 'string') {
       return createResponse(400, {
-        error: 'summonerName is required and must be a string'
+        error: 'gameName is required and must be a string'
       });
     }
 
-    if (summonerName.trim().length === 0) {
+    if (!tagLine || typeof tagLine !== 'string') {
       return createResponse(400, {
-        error: 'summonerName cannot be empty'
+        error: 'tagLine is required and must be a string'
       });
     }
 
-    // Validate region
-    const validRegions = ['na1', 'euw1', 'eun1', 'kr', 'jp1', 'br1', 'la1', 'la2', 'oc1', 'tr1', 'ru'];
-    if (!validRegions.includes(region)) {
+    if (gameName.trim().length === 0) {
       return createResponse(400, {
-        error: `Invalid region. Must be one of: ${validRegions.join(', ')}`
+        error: 'gameName cannot be empty'
       });
     }
 
-    // Get API key from environment variables
-    // Set this in Netlify dashboard: Site settings → Environment variables
+    // Get API key from environment
     const apiKey = process.env.RIOT_API_KEY;
     
     if (!apiKey) {
@@ -89,11 +95,15 @@ exports.handler = async (event, context) => {
       });
     }
 
-    // Build the Riot API URL
-    const encodedSummonerName = encodeURIComponent(summonerName.trim());
-    const riotApiUrl = `https://${region}.api.riotgames.com/lol/summoner/v4/summoners/by-name/${encodedSummonerName}`;
+    // Get the correct regional endpoint
+    const region = getAccountRegion(tagLine);
+    
+    // Build the API URL
+    const encodedGameName = encodeURIComponent(gameName.trim());
+    const encodedTagLine = encodeURIComponent(tagLine.trim());
+    const riotApiUrl = `https://${region}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${encodedGameName}/${encodedTagLine}`;
 
-    console.log(`Fetching summoner: ${summonerName} from region: ${region}`);
+    console.log(`Fetching account: ${gameName}#${tagLine} from region: ${region}`);
 
     // Make the request to Riot Games API
     const response = await fetch(riotApiUrl, {
@@ -106,11 +116,11 @@ exports.handler = async (event, context) => {
 
     // Handle different response status codes
     if (!response.ok) {
-      let errorMessage = 'Failed to fetch summoner data';
+      let errorMessage = 'Failed to fetch account data';
       
       switch (response.status) {
         case 404:
-          errorMessage = 'Summoner not found';
+          errorMessage = `Player "${gameName}#${tagLine}" not found`;
           break;
         case 401:
         case 403:
@@ -131,11 +141,11 @@ exports.handler = async (event, context) => {
     }
 
     // Parse and return the successful response
-    const summonerData = await response.json();
+    const accountData = await response.json();
     
-    console.log(`Successfully fetched summoner data for: ${summonerName}`);
+    console.log(`Successfully fetched account data for: ${gameName}#${tagLine}`);
     
-    return createResponse(200, summonerData);
+    return createResponse(200, accountData);
 
   } catch (error) {
     console.error('Function error:', error);

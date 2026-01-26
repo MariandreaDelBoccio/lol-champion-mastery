@@ -9,6 +9,7 @@ const DDRAGON_BASE_URL = `https://ddragon.leagueoflegends.com/cdn/${DDRAGON_VERS
 
 // In-memory cache to avoid refetching static data
 let championDataCache = null;
+let championDetailsCache = new Map(); // Cache for individual champion details
 
 /**
  * Fetch all champion data from Data Dragon
@@ -59,6 +60,51 @@ export async function getChampionById(championId) {
   }
   
   return champion;
+}
+
+/**
+ * Get detailed champion information including tips, abilities, etc.
+ * This fetches from the individual champion endpoint which has more complete data
+ * @param {number} championId - The champion's numeric ID
+ * @returns {Promise} - Promise that resolves to detailed champion info
+ */
+export async function getChampionDetailsById(championId) {
+  // Check cache first
+  if (championDetailsCache.has(championId)) {
+    return championDetailsCache.get(championId);
+  }
+
+  try {
+    // First get basic champion data to find the champion name
+    const basicChampion = await getChampionById(championId);
+    const championName = basicChampion.id; // The 'id' field contains the champion name
+    
+    console.log(`🔍 Fetching detailed data for champion: ${championName}`);
+    
+    // Fetch detailed champion data
+    const response = await fetch(`${DDRAGON_BASE_URL}/data/en_US/champion/${championName}.json`);
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch champion details: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const championDetails = data.data[championName];
+    
+    if (!championDetails) {
+      throw new Error(`Champion details not found for ${championName}`);
+    }
+    
+    console.log(`✅ Successfully fetched details for ${championName}`);
+    
+    // Cache the detailed data
+    championDetailsCache.set(championId, championDetails);
+    
+    return championDetails;
+  } catch (error) {
+    console.error(`❌ Error fetching champion details for ID ${championId}:`, error);
+    throw new Error('Failed to load detailed champion information');
+  }
 }
 
 /**

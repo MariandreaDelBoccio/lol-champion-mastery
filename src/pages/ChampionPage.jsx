@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, useSearchParams, Link } from 'react-router-dom';
 import Loading from '../components/Loading';
 import ErrorMessage from '../components/ErrorMessage';
-import { getChampionById, getChampionSplashUrl, getMasteryBadgeUrl } from '../services/datadragon';
+import { getChampionDetailsById, getChampionSplashUrl, getMasteryBadgeUrl } from '../services/datadragon';
 import './ChampionPage.css';
 
 /**
@@ -11,9 +11,32 @@ import './ChampionPage.css';
  */
 function ChampionPage() {
   const { championId } = useParams();
+  const [searchParams] = useSearchParams();
+  const fromProfile = searchParams.get('from') === 'profile';
+  const playerName = searchParams.get('player');
+  const tagLine = searchParams.get('tagLine');
+  const puuid = searchParams.get('puuid');
+  
   const [championData, setChampionData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+
+  /**
+   * Get the appropriate back link based on where user came from
+   */
+  const getBackLink = () => {
+    if (fromProfile && playerName && tagLine && puuid) {
+      return `/profile/${encodeURIComponent(playerName)}?tagLine=${tagLine}&puuid=${encodeURIComponent(puuid)}`;
+    }
+    return '/search';
+  };
+
+  const getBackText = () => {
+    if (fromProfile && playerName) {
+      return `← Back to ${playerName}#${tagLine}'s Profile`;
+    }
+    return '← Back to Search';
+  };
 
   /**
    * Fetch champion data when component mounts
@@ -24,7 +47,7 @@ function ChampionPage() {
       setError('');
 
       try {
-        const champion = await getChampionById(championId);
+        const champion = await getChampionDetailsById(championId);
         setChampionData(champion);
       } catch (err) {
         setError(err.message || 'Failed to load champion data');
@@ -59,7 +82,7 @@ function ChampionPage() {
           onRetry={handleRetry}
         />
         <div className="back-link">
-          <Link to="/">← Back to Search</Link>
+          <Link to={getBackLink()}>{getBackText()}</Link>
         </div>
       </div>
     );
@@ -71,7 +94,7 @@ function ChampionPage() {
         <div className="champion-not-found">
           <h2>Champion not found</h2>
           <p>The requested champion could not be loaded.</p>
-          <Link to="/" className="back-link">← Back to Search</Link>
+          <Link to={getBackLink()} className="back-link">{getBackText()}</Link>
         </div>
       </div>
     );
@@ -85,8 +108,8 @@ function ChampionPage() {
       <div className="champion-hero" style={{ backgroundImage: `url(${splashUrl})` }}>
         <div className="champion-hero-overlay">
           <div className="champion-hero-content">
-            <Link to="/" className="back-link">
-              ← Back to Search
+            <Link to={getBackLink()} className="back-link">
+              {getBackText()}
             </Link>
             <h1 className="champion-name">{championData.name}</h1>
             <p className="champion-title">{championData.title}</p>
@@ -132,32 +155,52 @@ function ChampionPage() {
           </div>
         </div>
 
-        {/* Additional info */}
-        <div className="champion-additional">
-          <div className="champion-tips">
-            <h3>Playing as {championData.name}</h3>
-            {championData.allytips && championData.allytips.length > 0 ? (
-              <ul>
-                {championData.allytips.slice(0, 3).map((tip, index) => (
-                  <li key={index}>{tip}</li>
-                ))}
-              </ul>
-            ) : (
-              <p>No tips available for this champion.</p>
-            )}
-          </div>
+        {/* Tips and Strategy */}
+        <div className="champion-tips-section">
+          <div className="tips-container">
+            <div className="champion-tips ally-tips">
+              <div className="tips-header">
+                <div className="tips-icon ally-icon">⚔️</div>
+                <h3>Playing as {championData.name}</h3>
+              </div>
+              {championData.allytips && championData.allytips.length > 0 ? (
+                <ul className="tips-list">
+                  {championData.allytips.map((tip, index) => (
+                    <li key={index} className="tip-item">
+                      <span className="tip-bullet">•</span>
+                      <span className="tip-text">{tip}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <div className="no-tips">
+                  <p>No specific tips available for playing as {championData.name}.</p>
+                  <p className="tip-suggestion">Check champion guides and pro builds for strategies!</p>
+                </div>
+              )}
+            </div>
 
-          <div className="champion-tips">
-            <h3>Playing against {championData.name}</h3>
-            {championData.enemytips && championData.enemytips.length > 0 ? (
-              <ul>
-                {championData.enemytips.slice(0, 3).map((tip, index) => (
-                  <li key={index}>{tip}</li>
-                ))}
-              </ul>
-            ) : (
-              <p>No tips available for playing against this champion.</p>
-            )}
+            <div className="champion-tips enemy-tips">
+              <div className="tips-header">
+                <div className="tips-icon enemy-icon">🛡️</div>
+                <h3>Playing against {championData.name}</h3>
+              </div>
+              {championData.enemytips && championData.enemytips.length > 0 ? (
+                <ul className="tips-list">
+                  {championData.enemytips.map((tip, index) => (
+                    <li key={index} className="tip-item">
+                      <span className="tip-bullet">•</span>
+                      <span className="tip-text">{tip}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <div className="no-tips">
+                  <p>No specific tips available for playing against {championData.name}.</p>
+                  <p className="tip-suggestion">Focus on their weaknesses and cooldown windows!</p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

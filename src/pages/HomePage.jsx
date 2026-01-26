@@ -21,7 +21,7 @@ function HomePage() {
     { value: 'na1', label: 'North America' },
     { value: 'euw1', label: 'Europe West' },
     { value: 'eun1', label: 'Europe Nordic & East' },
-    { value: 'kr', label: 'Korea' },
+    { value: 'kr1', label: 'Korea' },
     { value: 'jp1', label: 'Japan' },
     { value: 'br1', label: 'Brazil' },
     { value: 'la1', label: 'Latin America North' },

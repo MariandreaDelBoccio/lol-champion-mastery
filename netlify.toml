@@ -14,13 +14,13 @@
 # Development configuration for netlify dev
 [dev]
   # Command to start the development server
-  command = "vite"
+  command = "npm run dev"
   
-  # Port for the development server (let Vite choose)
-  # port = 5173
+  # Port for the development server
+  port = 3000
   
   # Auto-open browser
-  autoLaunch = true
+  autoLaunch = false
   
   # Functions port
   functionsPort = 8888

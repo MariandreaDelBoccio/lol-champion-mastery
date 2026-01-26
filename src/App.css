@@ -1,6 +1,6 @@
 /* Global styles and CSS variables */
 :root {
-  --primary-color: #c89b3c;
+  --primary-color: #C8AA6E;
   --secondary-color: #0f2027;
   --accent-color: #cdbe91;
   --background-dark: #010a13;
@@ -11,6 +11,9 @@
   --border-color: #463714;
   --error-color: #c8aa6e;
   --success-color: #0596aa;
+  --gold: #C8AA6E;
+  --gold-dark: #9d8653;
+  --gold-light: #e6c97a;
 }
 
 * {
@@ -21,9 +24,10 @@
 
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: var(--background-dark);
+  background: linear-gradient(to top, rgb(10, 20, 40) 0%, transparent 100%) center bottom / 100% 50% no-repeat, var(--background-dark);
   color: var(--text-primary);
   line-height: 1.6;
+  min-height: 100vh;
 }
 
 .app {
@@ -35,6 +39,42 @@ body {
 .main-content {
   flex: 1;
   padding-top: 80px; /* Account for fixed header */
+}
+
+/* Gradient text utility */
+.text-gradient-gold {
+  background: linear-gradient(135deg, var(--gold-dark), var(--gold), var(--gold-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Animation utilities */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.6; }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.6s ease-out forwards;
 }
 
 /* Common button styles */
@@ -55,14 +95,15 @@ button:disabled {
 
 /* Primary button */
 .btn-primary {
-  background-color: var(--primary-color);
+  background: linear-gradient(135deg, var(--gold-dark), var(--gold), var(--gold-light));
   color: var(--background-dark);
   font-weight: 600;
+  box-shadow: 0 4px 15px rgba(200, 170, 110, 0.3);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background-color: var(--accent-color);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(200, 170, 110, 0.4);
 }
 
 /* Secondary button */

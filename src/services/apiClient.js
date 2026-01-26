@@ -36,27 +36,15 @@ import {
 
 /**
  * Get the base URL for Netlify Functions
- * In development: http://localhost:8888/.netlify/functions
+ * In development: http://localhost:3000/.netlify/functions (when using netlify dev)
  * In production: https://your-site.netlify.app/.netlify/functions
  */
 function getApiBaseUrl() {
   // Check if we're in development mode
   if (import.meta.env.DEV) {
-    // For local development, we can use either:
-    // 1. Netlify dev server (if running netlify dev)
-    // 2. Direct Vite dev server (if running npm run dev)
-    
-    // Try to detect if we're running with netlify dev
-    const isNetlifyDev = window.location.port === '8888';
-    
-    if (isNetlifyDev) {
-      return '/.netlify/functions';
-    } else {
-      // Running with regular Vite dev server
-      // Functions won't work, but we can show a helpful message
-      console.warn('⚠️  Running without Netlify Functions. Using mock data for development.');
-      return null; // Signal to use mock data
-    }
+    // For local development with netlify dev
+    // The functions are available at the same host as the dev server
+    return '/.netlify/functions';
   } else {
     // Production - use the current domain
     return `${window.location.origin}/.netlify/functions`;
@@ -64,10 +52,11 @@ function getApiBaseUrl() {
 }
 
 /**
- * Check if we should use mock data (when Netlify Functions are not available)
+ * Check if we should use mock data (only when explicitly needed for testing)
  */
 function shouldUseMockData() {
-  return import.meta.env.DEV && getApiBaseUrl() === null;
+  // Only use mock data if explicitly set via environment variable
+  return import.meta.env.VITE_USE_MOCK_DATA === 'true';
 }
 
 /**
@@ -80,15 +69,11 @@ function shouldUseMockData() {
  */
 async function callNetlifyFunction(functionName, data) {
   const baseUrl = getApiBaseUrl();
-  
-  if (!baseUrl) {
-    throw new Error('Netlify Functions not available in this environment');
-  }
-  
   const url = `${baseUrl}/${functionName}`;
   
   try {
-    console.log(`Calling Netlify Function: ${functionName}`, data);
+    console.log(`🚀 Calling Netlify Function: ${functionName}`, data);
+    console.log(`📍 URL: ${url}`);
     
     const response = await fetch(url, {
       method: 'POST',
@@ -98,20 +83,23 @@ async function callNetlifyFunction(functionName, data) {
       body: JSON.stringify(data)
     });
 
+    console.log(`📡 Response status: ${response.status}`);
+
     // Parse the response
     const responseData = await response.json();
 
     // Handle non-200 status codes
     if (!response.ok) {
+      console.error(`❌ Function error:`, responseData);
       // The function returned an error
       throw new Error(responseData.error || `Function call failed with status: ${response.status}`);
     }
 
-    console.log(`Successfully called ${functionName}`);
+    console.log(`✅ Successfully called ${functionName}`, responseData);
     return responseData;
     
   } catch (error) {
-    console.error(`Error calling ${functionName}:`, error);
+    console.error(`❌ Error calling ${functionName}:`, error);
     
     // Handle network errors
     if (error.name === 'TypeError' && error.message.includes('fetch')) {
@@ -129,39 +117,38 @@ async function callNetlifyFunction(functionName, data) {
 }
 
 /**
- * Fetch summoner data by name and region
+ * Fetch account data by Riot ID (Game Name + Tag Line)
  * 
- * This function calls our Netlify Function instead of calling
- * the Riot API directly from the frontend.
+ * This is the new way to get player information using the modern Riot ID system.
  * 
- * @param {string} summonerName - The summoner's name
- * @param {string} region - The region (e.g., 'na1', 'euw1')
- * @returns {Promise<Object>} - Promise that resolves to summoner data
+ * @param {string} gameName - The player's game name
+ * @param {string} tagLine - The player's tag line (region)
+ * @returns {Promise<Object>} - Promise that resolves to account data with PUUID
  */
-export async function fetchSummonerByName(summonerName, region = 'na1') {
-  // Use mock data if Netlify Functions are not available
+export async function fetchAccountByRiotId(gameName, tagLine) {
+  // Use mock data if explicitly set
   if (shouldUseMockData()) {
-    return mockFetchSummonerByName(summonerName, region);
+    return mockFetchSummonerByName(gameName, tagLine); // Reuse mock for now
   }
 
   try {
-    console.log(`Fetching summoner: ${summonerName} in region: ${region}`);
+    console.log(`🚀 Fetching account: ${gameName}#${tagLine}`);
     
-    // Call our Netlify Function
-    const summonerData = await callNetlifyFunction('getSummoner', {
-      summonerName: summonerName,
-      region: region
+    // Call our new Netlify Function
+    const accountData = await callNetlifyFunction('getAccountByRiotId', {
+      gameName: gameName,
+      tagLine: tagLine
     });
     
-    console.log('Summoner data received successfully');
-    return summonerData;
+    console.log('✅ Account data received successfully');
+    return accountData;
     
   } catch (error) {
-    console.error('Error fetching summoner data:', error);
+    console.error('❌ Error fetching account data:', error);
     
     // Provide user-friendly error messages
-    if (error.message.includes('Summoner not found')) {
-      throw new Error(`Summoner "${summonerName}" not found in ${region.toUpperCase()}. Please check the spelling and region.`);
+    if (error.message.includes('not found')) {
+      throw new Error(`Player "${gameName}#${tagLine}" not found. Please check the spelling and tag line.`);
     } else if (error.message.includes('Rate limit exceeded')) {
       throw new Error('Too many requests. Please wait a moment and try again.');
     } else if (error.message.includes('API key')) {
@@ -169,7 +156,52 @@ export async function fetchSummonerByName(summonerName, region = 'na1') {
     } else if (error.message.includes('Network error')) {
       throw new Error('Connection error. Please check your internet connection.');
     } else {
-      throw new Error(error.message || 'Failed to fetch summoner data. Please try again.');
+      throw new Error(error.message || 'Failed to fetch account data. Please try again.');
+    }
+  }
+}
+
+/**
+ * Fetch champion mastery data using PUUID
+ * 
+ * This is the new way to get champion mastery data using PUUID instead of summoner ID.
+ * 
+ * @param {string} puuid - The player's PUUID
+ * @param {string} tagLine - The player's tag line (for region mapping)
+ * @returns {Promise<Array>} - Promise that resolves to champion mastery array
+ */
+export async function fetchChampionMasteryByPuuid(puuid, tagLine) {
+  // Use mock data if explicitly set
+  if (shouldUseMockData()) {
+    return mockFetchChampionMastery(puuid, tagLine); // Reuse mock for now
+  }
+
+  try {
+    console.log(`🚀 Fetching champion mastery for PUUID: ${puuid.substring(0, 10)}...`);
+    
+    // Call our new Netlify Function
+    const masteryData = await callNetlifyFunction('getChampionMasteryByPuuid', {
+      puuid: puuid,
+      tagLine: tagLine
+    });
+    
+    console.log('✅ Champion mastery data received successfully');
+    return masteryData;
+    
+  } catch (error) {
+    console.error('❌ Error fetching champion mastery:', error);
+    
+    // Provide user-friendly error messages
+    if (error.message.includes('not found')) {
+      throw new Error('No champion mastery data found for this player.');
+    } else if (error.message.includes('Rate limit exceeded')) {
+      throw new Error('Too many requests. Please wait a moment and try again.');
+    } else if (error.message.includes('API key')) {
+      throw new Error('Service configuration error. Please try again later.');
+    } else if (error.message.includes('Network error')) {
+      throw new Error('Connection error. Please check your internet connection.');
+    } else {
+      throw new Error(error.message || 'Failed to fetch champion mastery data. Please try again.');
     }
   }
 }

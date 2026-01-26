@@ -23,13 +23,20 @@
   display: flex;
   align-items: center;
   text-decoration: none;
+  gap: 8px;
+}
+
+.logo-icon {
+  width: 24px;
+  height: 24px;
+  color: var(--gold);
 }
 
 .logo-text {
   font-size: 24px;
   font-weight: bold;
-  color: var(--primary-color);
-  text-shadow: 0 0 10px rgba(200, 155, 60, 0.3);
+  color: var(--gold);
+  text-shadow: 0 0 10px rgba(200, 170, 110, 0.3);
 }
 
 .nav {

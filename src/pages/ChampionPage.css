@@ -51,7 +51,7 @@
 }
 
 .champion-name {
-  font-size: 48px;
+  font-size: 30px;
   font-weight: bold;
   color: var(--primary-color);
   margin-bottom: 8px;
@@ -137,51 +137,144 @@
   font-size: 16px;
 }
 
-.champion-additional {
+.champion-tips-section {
+  margin-top: 40px;
+}
+
+.tips-container {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 40px;
+  gap: 30px;
 }
 
 .champion-tips {
-  background-color: var(--background-medium);
+  background: linear-gradient(135deg, var(--background-medium) 0%, var(--background-light) 100%);
   border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 25px;
+  border-radius: 12px;
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+.champion-tips::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--gold-dark), var(--gold), var(--gold-light));
+}
+
+.ally-tips::before {
+  background: linear-gradient(90deg, #0596aa, #00c9ff, #0596aa);
+}
+
+.enemy-tips::before {
+  background: linear-gradient(90deg, #dc2626, #ef4444, #dc2626);
+}
+
+.tips-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.tips-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+.ally-icon {
+  background: linear-gradient(135deg, #0596aa, #00c9ff);
+  color: white;
+}
+
+.enemy-icon {
+  background: linear-gradient(135deg, #dc2626, #ef4444);
+  color: white;
 }
 
 .champion-tips h3 {
-  color: var(--primary-color);
+  color: var(--text-primary);
   font-size: 18px;
-  margin-bottom: 15px;
+  font-weight: 600;
+  margin: 0;
 }
 
-.champion-tips ul {
+.tips-list {
   list-style: none;
   padding: 0;
+  margin: 0;
 }
 
-.champion-tips li {
-  color: var(--text-primary);
-  font-size: 14px;
-  line-height: 1.6;
-  margin-bottom: 12px;
-  padding-left: 20px;
-  position: relative;
+.tip-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 12px;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  border-left: 3px solid var(--primary-color);
 }
 
-.champion-tips li:before {
-  content: "•";
+.ally-tips .tip-item {
+  border-left-color: #0596aa;
+}
+
+.enemy-tips .tip-item {
+  border-left-color: #dc2626;
+}
+
+.tip-bullet {
   color: var(--primary-color);
   font-weight: bold;
-  position: absolute;
-  left: 0;
+  font-size: 16px;
+  line-height: 1;
+  margin-top: 2px;
+  flex-shrink: 0;
 }
 
-.champion-tips p {
-  color: var(--text-secondary);
-  font-style: italic;
+.ally-tips .tip-bullet {
+  color: #0596aa;
+}
+
+.enemy-tips .tip-bullet {
+  color: #dc2626;
+}
+
+.tip-text {
+  color: var(--text-primary);
   font-size: 14px;
+  line-height: 1.5;
+  flex: 1;
+}
+
+.no-tips {
+  text-align: center;
+  padding: 20px;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  border: 1px dashed var(--border-color);
+}
+
+.no-tips p {
+  color: var(--text-secondary);
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.tip-suggestion {
+  color: var(--primary-color);
+  font-style: italic;
+  font-size: 13px;
 }
 
 .champion-not-found {
@@ -227,9 +320,9 @@
     gap: 30px;
   }
   
-  .champion-additional {
+  .tips-container {
     grid-template-columns: 1fr;
-    gap: 30px;
+    gap: 20px;
   }
   
   .stats-grid {
@@ -252,5 +345,19 @@
   
   .champion-tips {
     padding: 20px;
+  }
+  
+  .tip-item {
+    padding: 10px;
+  }
+  
+  .tips-header {
+    gap: 8px;
+  }
+  
+  .tips-icon {
+    width: 28px;
+    height: 28px;
+    font-size: 14px;
   }
 }

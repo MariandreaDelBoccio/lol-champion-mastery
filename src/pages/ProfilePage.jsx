@@ -3,21 +3,22 @@ import { useParams, useSearchParams, Link } from 'react-router-dom';
 import Loading from '../components/Loading';
 import ErrorMessage from '../components/ErrorMessage';
 import ChampionList from '../components/ChampionList';
-import { fetchSummonerByName, fetchChampionMastery } from '../services/apiClient';
+import { fetchChampionMasteryByPuuid } from '../services/apiClient';
 import { fetchChampionData } from '../services/datadragon';
 import './ProfilePage.css';
 
 /**
- * ProfilePage component displays summoner info and champion mastery
- * Shows a list of champions with mastery data for the searched summoner
+ * ProfilePage component displays player info and champion mastery
+ * Now uses the new PUUID-based system instead of summoner names
  */
 function ProfilePage() {
-  const { summonerName } = useParams();
+  const { summonerName } = useParams(); // This is actually the gameName now
   const [searchParams] = useSearchParams();
-  const region = searchParams.get('region') || 'na1';
+  const tagLine = searchParams.get('tagLine') || 'EUW';
+  const puuid = searchParams.get('puuid');
 
-  // State for summoner data
-  const [summonerData, setSummonerData] = useState(null);
+  // State for player data
+  const [playerData, setPlayerData] = useState(null);
   const [masteryData, setMasteryData] = useState(null);
   const [championData, setChampionData] = useState(null);
   
@@ -34,36 +35,56 @@ function ProfilePage() {
       setError('');
 
       try {
-        // Fetch summoner data first
-        const summoner = await fetchSummonerByName(summonerName, region);
-        setSummonerData(summoner);
+        // Check if we have the required parameters
+        if (!summonerName) {
+          throw new Error('Missing player name. Please search again.');
+        }
+
+        if (!puuid) {
+          throw new Error('Missing player information. Please search again.');
+        }
+
+        console.log(`🔍 Loading profile for ${summonerName}#${tagLine} with PUUID: ${puuid.substring(0, 10)}...`);
+
+        // Set basic player data from URL params
+        setPlayerData({
+          gameName: summonerName,
+          tagLine: tagLine,
+          puuid: puuid
+        });
 
         // Fetch champion mastery data and static champion data in parallel
         const [mastery, champions] = await Promise.all([
-          fetchChampionMastery(summoner.id, region),
+          fetchChampionMasteryByPuuid(puuid, tagLine),
           fetchChampionData()
         ]);
 
         setMasteryData(mastery);
         setChampionData(champions);
+        
+        console.log(`✅ Successfully loaded profile for ${summonerName}#${tagLine}`);
       } catch (err) {
+        console.error('❌ Error loading profile:', err);
         setError(err.message || 'Failed to load profile data');
       } finally {
         setLoading(false);
       }
     };
 
-    if (summonerName) {
+    if (summonerName && tagLine) {
       fetchData();
+    } else {
+      setLoading(false);
+      setError('Invalid profile URL. Please search again.');
     }
-  }, [summonerName, region]);
+  }, [summonerName, tagLine, puuid]);
 
   /**
    * Retry loading data
    */
   const handleRetry = () => {
-    // Trigger useEffect by clearing and resetting summoner data
-    setSummonerData(null);
+    // Trigger useEffect by clearing and resetting player data
+    setPlayerData(null);
     setMasteryData(null);
     setChampionData(null);
   };
@@ -88,7 +109,7 @@ function ProfilePage() {
 
   // Show loading state
   if (loading) {
-    return <Loading message="Loading summoner profile..." />;
+    return <Loading message="Loading player profile..." />;
   }
 
   // Show error state
@@ -100,7 +121,7 @@ function ProfilePage() {
           onRetry={handleRetry}
         />
         <div className="back-link">
-          <Link to="/">← Back to Search</Link>
+          <Link to="/search">← Back to Search</Link>
         </div>
       </div>
     );
@@ -108,72 +129,92 @@ function ProfilePage() {
 
   const championsWithMastery = getChampionsWithMastery();
 
+  /**
+   * Get mastery level color based on level
+   */
+  const getMasteryLevelColor = (level) => {
+    if (level === 7) return 'mastery-7'; // Teal
+    if (level >= 5) return 'mastery-5-6'; // Purple
+    if (level === 4) return 'mastery-4'; // Gold
+    return 'mastery-default'; // Default
+  };
+
   return (
     <div className="profile-page">
-      <div className="profile-header">
-        <Link to="/" className="back-link">
-          ← Back to Search
-        </Link>
-        
-        {summonerData && (
-          <div className="summoner-info">
-            <div className="summoner-icon">
-              <img 
-                src={`https://ddragon.leagueoflegends.com/cdn/14.1.1/img/profileicon/${summonerData.profileIconId}.png`}
-                alt="Summoner Icon"
-                onError={(e) => {
-                  e.target.src = 'https://via.placeholder.com/64x64?text=Icon';
-                }}
-              />
+      <div className="profile-container">
+        <div className="profile-header">
+          <Link to="/search" className="back-link">
+            ← Back to Search
+          </Link>
+          
+          {playerData && (
+            <div className="summoner-card">
+              <div className="summoner-icon">
+                <img 
+                  src={`https://ddragon.leagueoflegends.com/cdn/14.1.1/img/profileicon/1.png`}
+                  alt="Player Icon"
+                  onError={(e) => {
+                    e.target.src = 'https://via.placeholder.com/80x80?text=Icon';
+                  }}
+                />
+              </div>
+              <div className="summoner-details">
+                <h1 className="summoner-name text-gradient-gold">{playerData.gameName}</h1>
+                <div className="summoner-stats">
+                  <span className="summoner-level">#{playerData.tagLine}</span>
+                  <span className="summoner-region">{tagLine}</span>
+                </div>
+              </div>
             </div>
-            <div className="summoner-details">
-              <h1>{summonerData.name}</h1>
-              <p>Level {summonerData.summonerLevel}</p>
-              <p className="region-info">Region: {region.toUpperCase()}</p>
-            </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
 
-      <div className="mastery-section">
-        <h2>Champion Mastery</h2>
-        
-        {championsWithMastery.length > 0 ? (
-          <>
-            <p className="mastery-count">
-              Showing {championsWithMastery.length} champions with mastery data
-            </p>
-            <div className="champions-container">
+        <div className="mastery-section">
+          <div className="mastery-header">
+            <h2>Champion Mastery</h2>
+            {championsWithMastery.length > 0 && (
+              <p className="mastery-count">
+                {championsWithMastery.length} champions mastered
+              </p>
+            )}
+          </div>
+          
+          {championsWithMastery.length > 0 ? (
+            <div className="champions-grid">
               {championsWithMastery.map(({ champion, mastery }) => (
-                <div key={champion.key} className="champion-mastery-item">
-                  <Link 
-                    to={`/champion/${champion.key}`}
-                    className="champion-mastery-link"
-                  >
+                <Link 
+                  key={champion.key}
+                  to={`/champion/${champion.key}?from=profile&player=${encodeURIComponent(playerData.gameName)}&tagLine=${tagLine}&puuid=${encodeURIComponent(playerData.puuid)}`}
+                  className="champion-card"
+                >
+                  <div className="champion-image-container">
                     <img 
                       src={`https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/${champion.id}.png`}
                       alt={champion.name}
-                      className="champion-icon"
+                      className="champion-image"
                     />
-                    <div className="champion-mastery-info">
-                      <h3>{champion.name}</h3>
-                      <p className="champion-title">{champion.title}</p>
-                      <div className="mastery-stats">
-                        <span className="mastery-level">Level {mastery.championLevel}</span>
-                        <span className="mastery-points">{mastery.championPoints.toLocaleString()} points</span>
-                      </div>
+                    <div className={`mastery-badge ${getMasteryLevelColor(mastery.championLevel)}`}>
+                      {mastery.championLevel}
                     </div>
-                  </Link>
-                </div>
+                  </div>
+                  <div className="champion-info">
+                    <h3 className="champion-name">{champion.name}</h3>
+                    <p className="champion-title">{champion.title}</p>
+                    <div className="mastery-points">
+                      {mastery.championPoints.toLocaleString()} pts
+                    </div>
+                  </div>
+                </Link>
               ))}
             </div>
-          </>
-        ) : (
-          <div className="no-mastery">
-            <h3>No champion mastery data found</h3>
-            <p>This summoner hasn't played any champions yet, or the data is not available.</p>
-          </div>
-        )}
+          ) : (
+            <div className="no-mastery-card">
+              <div className="no-mastery-icon">⚔️</div>
+              <h3>No Champion Mastery</h3>
+              <p>This summoner hasn't earned mastery on any champions yet.</p>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
