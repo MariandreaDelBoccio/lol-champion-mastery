@@ -38,7 +38,7 @@ function getAccountRegion(tagLine) {
     'BR1': 'americas',
     'LA1': 'americas',
     'LA2': 'americas',
-    'KR': 'asia',
+    'KR1': 'asia',
     'JP1': 'asia',
     'OC1': 'asia'
   };

@@ -71,7 +71,7 @@ exports.handler = async (event, context) => {
     }
 
     // Validate region
-    const validRegions = ['na1', 'euw1', 'eun1', 'kr', 'jp1', 'br1', 'la1', 'la2', 'oc1', 'tr1', 'ru'];
+    const validRegions = ['na1', 'euw1', 'eun1', 'kr1', 'jp1', 'br1', 'la1', 'la2', 'oc1', 'tr1', 'ru'];
     if (!validRegions.includes(region)) {
       return createResponse(400, {
         error: `Invalid region. Must be one of: ${validRegions.join(', ')}`

@@ -38,7 +38,7 @@ function getGameRegion(tagLine) {
     'BR1': 'br1',
     'LA1': 'la1',
     'LA2': 'la2',
-    'KR': 'kr',
+    'KR1': 'kr',
     'JP1': 'jp1',
     'OC1': 'oc1'
   };

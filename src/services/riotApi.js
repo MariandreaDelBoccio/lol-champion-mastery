@@ -12,7 +12,7 @@ const REGION_MAPPING = {
   'na1': 'americas',
   'euw1': 'europe',
   'eun1': 'europe',
-  'kr': 'asia',
+  'kr1': 'asia',
   'jp1': 'asia',
   'br1': 'americas',
   'la1': 'americas',
