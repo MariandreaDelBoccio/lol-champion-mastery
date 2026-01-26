@@ -1,0 +1,110 @@
+.champion-card {
+  display: block;
+  background-color: var(--background-medium);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 16px;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.champion-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--primary-color);
+  box-shadow: 0 8px 25px rgba(200, 155, 60, 0.2);
+}
+
+.champion-image-container {
+  position: relative;
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: center;
+}
+
+.champion-image {
+  width: 80px;
+  height: 80px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 2px solid var(--border-color);
+  transition: border-color 0.3s ease;
+}
+
+.champion-card:hover .champion-image {
+  border-color: var(--primary-color);
+}
+
+.mastery-badge {
+  position: absolute;
+  bottom: -8px;
+  right: -8px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid var(--background-medium);
+}
+
+.champion-info {
+  text-align: center;
+}
+
+.champion-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.champion-title {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+  font-style: italic;
+}
+
+.mastery-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mastery-level {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--primary-color);
+}
+
+.mastery-points {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.last-played {
+  font-size: 11px;
+  color: var(--text-secondary);
+  opacity: 0.8;
+}
+
+.no-mastery {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+@media (max-width: 768px) {
+  .champion-card {
+    padding: 12px;
+  }
+  
+  .champion-image {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .champion-name {
+    font-size: 16px;
+  }
+}

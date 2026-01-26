@@ -1,0 +1,46 @@
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+  background-color: var(--background-medium);
+  border: 1px solid var(--error-color);
+  border-radius: 8px;
+  margin: 20px;
+}
+
+.error-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.error-title {
+  color: var(--error-color);
+  font-size: 24px;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.error-message {
+  color: var(--text-secondary);
+  font-size: 16px;
+  margin-bottom: 20px;
+  max-width: 500px;
+  line-height: 1.5;
+}
+
+.retry-btn {
+  background-color: var(--primary-color);
+  color: var(--background-dark);
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.retry-btn:hover {
+  background-color: var(--accent-color);
+  transform: translateY(-1px);
+}

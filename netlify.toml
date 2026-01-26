@@ -1,0 +1,60 @@
+# Netlify Configuration for LoL Champion Mastery App
+# This file tells Netlify how to build and deploy your application
+
+[build]
+  # Build command for the React app (production)
+  command = "npm run build"
+  
+  # Directory where the built files are located
+  publish = "dist"
+  
+  # Directory where Netlify Functions are located
+  functions = "netlify/functions"
+
+# Development configuration for netlify dev
+[dev]
+  # Command to start the development server
+  command = "vite"
+  
+  # Port for the development server (let Vite choose)
+  # port = 5173
+  
+  # Auto-open browser
+  autoLaunch = true
+  
+  # Functions port
+  functionsPort = 8888
+
+# Environment variables for build process
+[build.environment]
+  # Node.js version to use
+  NODE_VERSION = "18"
+
+# Redirect rules for Single Page Application (SPA)
+# This ensures that all routes are handled by React Router
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Headers for security and performance
+[[headers]]
+  for = "/*"
+  [headers.values]
+    # Security headers
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    
+    # CORS headers for API functions
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, POST, OPTIONS"
+    Access-Control-Allow-Headers = "Content-Type"
+
+# Specific headers for API functions
+[[headers]]
+  for = "/.netlify/functions/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, POST, OPTIONS"
+    Access-Control-Allow-Headers = "Content-Type"
