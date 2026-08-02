@@ -125,19 +125,20 @@ async function callNetlifyFunction(functionName, data) {
  * @param {string} tagLine - The player's tag line (region)
  * @returns {Promise<Object>} - Promise that resolves to account data with PUUID
  */
-export async function fetchAccountByRiotId(gameName, tagLine) {
+export async function fetchAccountByRiotId(gameName, tagLine, platform) {
   // Use mock data if explicitly set
   if (shouldUseMockData()) {
     return mockFetchSummonerByName(gameName, tagLine); // Reuse mock for now
   }
 
   try {
-    console.log(`🚀 Fetching account: ${gameName}#${tagLine}`);
+    console.log(`🚀 Fetching account: ${gameName}#${tagLine} (${platform || 'auto'})`);
     
     // Call our new Netlify Function
     const accountData = await callNetlifyFunction('getAccountByRiotId', {
       gameName: gameName,
-      tagLine: tagLine
+      tagLine: tagLine,
+      platform: platform || undefined,
     });
     
     console.log('✅ Account data received successfully');
@@ -170,7 +171,7 @@ export async function fetchAccountByRiotId(gameName, tagLine) {
  * @param {string} tagLine - The player's tag line (for region mapping)
  * @returns {Promise<Array>} - Promise that resolves to champion mastery array
  */
-export async function fetchChampionMasteryByPuuid(puuid, tagLine) {
+export async function fetchChampionMasteryByPuuid(puuid, tagLine, platform) {
   // Use mock data if explicitly set
   if (shouldUseMockData()) {
     return mockFetchChampionMastery(puuid, tagLine); // Reuse mock for now
@@ -182,7 +183,8 @@ export async function fetchChampionMasteryByPuuid(puuid, tagLine) {
     // Call our new Netlify Function
     const masteryData = await callNetlifyFunction('getChampionMasteryByPuuid', {
       puuid: puuid,
-      tagLine: tagLine
+      tagLine: tagLine,
+      platform: platform || undefined,
     });
     
     console.log('✅ Champion mastery data received successfully');

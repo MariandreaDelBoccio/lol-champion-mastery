@@ -24,27 +24,7 @@ function createResponse(statusCode, body, headers = {}) {
   };
 }
 
-/**
- * Get the correct game region from tag line
- * This maps tag lines to the actual game server regions
- */
-function getGameRegion(tagLine) {
-  const regionMap = {
-    'EUW': 'euw1',
-    'EUNE': 'eun1', 
-    'TR1': 'tr1',
-    'RU': 'ru',
-    'NA1': 'na1',
-    'BR1': 'br1',
-    'LA1': 'la1',
-    'LA2': 'la2',
-    'KR1': 'kr',
-    'JP1': 'jp1',
-    'OC1': 'oc1'
-  };
-  
-  return regionMap[tagLine] || 'na1';
-}
+const { resolveRouting } = require('./_regions.cjs');
 
 /**
  * Main handler function
@@ -64,7 +44,7 @@ exports.handler = async (event, context) => {
 
   try {
     // Parse request body
-    const { puuid, tagLine } = JSON.parse(event.body || '{}');
+    const { puuid, tagLine, platform } = JSON.parse(event.body || '{}');
 
     // Validate required parameters
     if (!puuid || typeof puuid !== 'string') {
@@ -73,9 +53,9 @@ exports.handler = async (event, context) => {
       });
     }
 
-    if (!tagLine || typeof tagLine !== 'string') {
+    if (!tagLine && !platform) {
       return createResponse(400, {
-        error: 'tagLine is required and must be a string'
+        error: 'platform or tagLine is required for region routing'
       });
     }
 
@@ -95,14 +75,15 @@ exports.handler = async (event, context) => {
       });
     }
 
-    // Get the correct game region
-    const region = getGameRegion(tagLine);
+    // Platform host for mastery API (euw1, na1, …)
+    const routing = resolveRouting(platform, tagLine);
+    const region = routing.platformHost;
     
     // Build the API URL
     const encodedPuuid = encodeURIComponent(puuid.trim());
     const riotApiUrl = `https://${region}.api.riotgames.com/lol/champion-mastery/v4/champion-masteries/by-puuid/${encodedPuuid}`;
 
-    console.log(`Fetching champion mastery for PUUID: ${puuid.substring(0, 10)}... from region: ${region}`);
+    console.log(`Fetching champion mastery for PUUID: ${puuid.substring(0, 10)}... platform=${routing.platform} host=${region}`);
 
     // Make the request to Riot Games API
     const response = await fetch(riotApiUrl, {

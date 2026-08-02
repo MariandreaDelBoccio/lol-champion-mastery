@@ -1,123 +1,45 @@
-.header {
+.mos-header {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  background-color: var(--background-medium);
-  border-bottom: 2px solid var(--border-color);
-  z-index: 1000;
-  height: 70px;
+  inset: 0 0 auto 0;
+  height: var(--header-h);
+  z-index: 100;
+  background: rgba(7, 7, 7, 0.92);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(10px);
 }
 
-.header-content {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
+.mos-header-inner {
   height: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
-.logo {
+.mos-logo {
+  font-family: var(--font-display);
+  font-size: 22px;
+  letter-spacing: 0.06em;
+  color: var(--text);
+}
+
+.mos-logo span {
+  color: var(--accent);
+}
+
+.mos-nav {
   display: flex;
-  align-items: center;
-  text-decoration: none;
-  gap: 8px;
+  gap: 28px;
 }
 
-.logo-icon {
-  width: 24px;
-  height: 24px;
-  color: var(--gold);
-}
-
-.logo-text {
-  font-size: 24px;
-  font-weight: bold;
-  color: var(--gold);
-  text-shadow: 0 0 10px rgba(200, 170, 110, 0.3);
-}
-
-.nav {
-  display: flex;
-  gap: 20px;
-}
-
-.nav-link {
-  color: var(--text-primary);
-  text-decoration: none;
-  padding: 8px 16px;
-  border-radius: 4px;
-  transition: all 0.2s ease;
-}
-
-.nav-link:hover {
-  background-color: var(--background-light);
-  color: var(--primary-color);
-}
-
-.user-section {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.user-info {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.username {
-  color: var(--text-secondary);
-  font-size: 14px;
-}
-
-.logout-btn {
-  background-color: transparent;
-  color: var(--text-primary);
-  border: 1px solid var(--border-color);
-  padding: 6px 12px;
-  border-radius: 4px;
+.mos-nav a {
   font-size: 12px;
-  transition: all 0.2s ease;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
 }
 
-.logout-btn:hover {
-  background-color: var(--error-color);
-  border-color: var(--error-color);
-  color: var(--background-dark);
-}
-
-.login-link {
-  color: var(--primary-color);
-  font-weight: 500;
-  padding: 8px 16px;
-  border: 1px solid var(--primary-color);
-  border-radius: 4px;
-  transition: all 0.2s ease;
-}
-
-.login-link:hover {
-  background-color: var(--primary-color);
-  color: var(--background-dark);
-}
-
-@media (max-width: 768px) {
-  .header {
-    height: 60px;
-  }
-  
-  .header-content {
-    padding: 0 15px;
-  }
-  
-  .logo-text {
-    font-size: 20px;
-  }
-  
-  .username {
-    display: none;
-  }
+.mos-nav a:hover,
+.mos-nav a.active {
+  color: var(--text);
 }

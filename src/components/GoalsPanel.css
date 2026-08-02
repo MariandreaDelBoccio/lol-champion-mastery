@@ -1,0 +1,135 @@
+.goals-panel {
+  background: linear-gradient(145deg, var(--background-medium), var(--background-light));
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 32px;
+}
+
+.goals-eyebrow {
+  color: var(--text-secondary);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 4px;
+}
+
+.goals-header h2 {
+  color: var(--primary-color);
+  font-size: 22px;
+  margin-bottom: 6px;
+}
+
+.goals-subtitle {
+  color: var(--text-secondary);
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+.goals-form {
+  display: grid;
+  grid-template-columns: 1.4fr 0.8fr auto;
+  gap: 12px;
+  align-items: end;
+  margin-bottom: 18px;
+}
+
+.goals-form-typed {
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+}
+
+.goals-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.goals-form select {
+  background: var(--background-dark);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 14px;
+}
+
+.goals-add-btn,
+.goals-remove-btn {
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.goals-add-btn {
+  background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+  color: var(--background-dark);
+  padding: 12px 16px;
+}
+
+.goals-add-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.goals-empty {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.goals-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.goals-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  background: rgba(1, 10, 19, 0.4);
+}
+
+.goals-item.is-done {
+  border-color: var(--success-color);
+}
+
+.goals-item-main {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.goals-status {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.goals-status.done {
+  color: var(--success-color);
+}
+
+.goals-remove-btn {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+  padding: 8px 12px;
+}
+
+.goals-remove-btn:hover {
+  color: var(--text-primary);
+  border-color: var(--primary-color);
+}
+
+@media (max-width: 768px) {
+  .goals-form {
+    grid-template-columns: 1fr;
+  }
+}

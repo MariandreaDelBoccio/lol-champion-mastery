@@ -1,0 +1,41 @@
+.concept-hint {
+  margin: 12px 0 20px;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  background: rgba(1, 10, 19, 0.35);
+  padding: 0 14px;
+}
+
+.concept-hint summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 12px 0;
+  color: var(--primary-color);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.concept-hint summary::-webkit-details-marker {
+  display: none;
+}
+
+.concept-hint summary::before {
+  content: '? ';
+  opacity: 0.7;
+}
+
+.concept-hint-body {
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.55;
+  padding: 0 0 14px;
+}
+
+.concept-hint-body p + p {
+  margin-top: 8px;
+}
+
+.concept-hint-body strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}

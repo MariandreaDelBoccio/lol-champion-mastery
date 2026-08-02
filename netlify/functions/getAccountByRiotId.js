@@ -24,27 +24,7 @@ function createResponse(statusCode, body, headers = {}) {
   };
 }
 
-/**
- * Get the correct regional endpoint for account API
- * The account API uses different regional endpoints than game-specific APIs
- */
-function getAccountRegion(tagLine) {
-  const regionMap = {
-    'EUW': 'europe',
-    'EUNE': 'europe', 
-    'TR1': 'europe',
-    'RU': 'europe',
-    'NA1': 'americas',
-    'BR1': 'americas',
-    'LA1': 'americas',
-    'LA2': 'americas',
-    'KR1': 'asia',
-    'JP1': 'asia',
-    'OC1': 'asia'
-  };
-  
-  return regionMap[tagLine] || 'americas';
-}
+const { resolveRouting } = require('./_regions.cjs');
 
 /**
  * Main handler function
@@ -64,7 +44,7 @@ exports.handler = async (event, context) => {
 
   try {
     // Parse request body
-    const { gameName, tagLine } = JSON.parse(event.body || '{}');
+    const { gameName, tagLine, platform } = JSON.parse(event.body || '{}');
 
     // Validate required parameters
     if (!gameName || typeof gameName !== 'string') {
@@ -95,15 +75,16 @@ exports.handler = async (event, context) => {
       });
     }
 
-    // Get the correct regional endpoint
-    const region = getAccountRegion(tagLine);
+    // Platform (game server) chooses account routing cluster; tag line is free text
+    const routing = resolveRouting(platform, tagLine);
+    const region = routing.accountCluster;
     
     // Build the API URL
     const encodedGameName = encodeURIComponent(gameName.trim());
     const encodedTagLine = encodeURIComponent(tagLine.trim());
     const riotApiUrl = `https://${region}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${encodedGameName}/${encodedTagLine}`;
 
-    console.log(`Fetching account: ${gameName}#${tagLine} from region: ${region}`);
+    console.log(`Fetching account: ${gameName}#${tagLine} platform=${routing.platform} cluster=${region}`);
 
     // Make the request to Riot Games API
     const response = await fetch(riotApiUrl, {

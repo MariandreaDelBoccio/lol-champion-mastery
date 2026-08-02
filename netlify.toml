@@ -17,7 +17,7 @@
   command = "npm run dev"
   
   # Port for the development server
-  port = 3000
+  port = 3001
   
   # Auto-open browser
   autoLaunch = false

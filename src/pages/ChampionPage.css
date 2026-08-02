@@ -361,3 +361,123 @@
     font-size: 14px;
   }
 }
+.champion-journey {
+  background: linear-gradient(145deg, var(--background-medium), var(--background-light));
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 32px;
+}
+
+.champion-journey.muted {
+  color: var(--text-secondary);
+}
+
+.journey-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.journey-eyebrow {
+  color: var(--text-secondary);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 4px;
+}
+
+.journey-header h2 {
+  color: var(--primary-color);
+  font-size: 22px;
+}
+
+.journey-activity {
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.journey-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.journey-metric {
+  text-align: center;
+  background: rgba(1, 10, 19, 0.4);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 14px 10px;
+}
+
+.journey-value {
+  display: block;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin-bottom: 4px;
+}
+
+.journey-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.journey-progress-block {
+  color: var(--text-secondary);
+  font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.journey-playtime {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.journey-complete {
+  color: var(--success-color);
+  font-weight: 600;
+}
+
+.journey-goal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.journey-goal-btn {
+  background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+  color: var(--background-dark);
+  border: none;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.journey-goal-msg {
+  color: var(--success-color);
+  font-size: 13px;
+}
+
+@media (max-width: 768px) {
+  .journey-metrics {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .journey-header {
+    flex-direction: column;
+  }
+}

@@ -79,6 +79,28 @@
   margin-bottom: 0.75rem;
 }
 
+.search-form-grid {
+  align-items: end;
+  flex-wrap: wrap;
+}
+
+.field-label {
+  display: block;
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+
+.search-input-container.grow {
+  flex: 1;
+  min-width: 220px;
+}
+
+.search-input-container .search-input {
+  width: 100%;
+  padding-left: 1rem;
+}
+
 /* Region Selector */
 .region-selector {
   position: relative;

@@ -4,4 +4,14 @@ import react from '@vitejs/plugin-react'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  optimizeDeps: {
+    // Avoid hanging the first request if dependency crawl never settles
+    holdUntilCrawlEnd: false,
+  },
+  server: {
+    host: '127.0.0.1',
+    watch: {
+      ignored: ['**/.netlify/**', '**/dist/**'],
+    },
+  },
 })
