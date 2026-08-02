@@ -30,8 +30,14 @@
   # Node.js version to use
   NODE_VERSION = "18"
 
+# Keep Netlify Functions out of the SPA fallback
+[[redirects]]
+  from = "/.netlify/functions/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+  force = true
+
 # Redirect rules for Single Page Application (SPA)
-# This ensures that all routes are handled by React Router
 [[redirects]]
   from = "/*"
   to = "/index.html"
